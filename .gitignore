@@ -1,4 +1,2 @@
 *.ps1
-*.bat
-SDCard/
-*.sh
+SDCard/*.img
