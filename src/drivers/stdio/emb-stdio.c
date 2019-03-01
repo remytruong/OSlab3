@@ -1,9 +1,12 @@
 
+#include <stdint.h>     // uint_x Types
 #include <stdarg.h>			// Varadic arguments
 #include <ctype.h>			// isdigit etc
 #include <string.h>			// strnlen used
-#include "../../boot/rpi-smartstart.h"
 #include "emb-stdio.h"			// This units header
+#include "../../kernel.h"		//Nothing will get printed withput this.... it checks for some defines
+
+#include "../../hal/hal.h"
 
 static int skip_atoi(const char **s)
 {
@@ -286,7 +289,7 @@ int sprintf(char *buf, const char *fmt, ...)
 	return i;
 }
 
-int printf (const char *fmt, ...)
+int printf_video (const char *fmt, ...)
 {
 	char printf_buf[512];
 	va_list args;
@@ -295,8 +298,31 @@ int printf (const char *fmt, ...)
 	va_start(args, fmt);
 	printed = vsprintf(printf_buf, fmt, args);
 	va_end(args);
-	for (int i = 0; i < printed; i++)
-		Embedded_Console_WriteChar(printf_buf[i]);
+	for (int i = 0; i < printed; i++){
+		//Here, this is where we plug out HAL putc
+#ifdef VIDEO_PRESENT
+		hal_io_video_putc( printf_buf[i], 2, VIDEO_COLOR_WHITE );
+#endif
+	}
+
+	return printed;
+}
+
+int printf_serial (const char *fmt, ...)
+{
+	char printf_buf[512];
+	va_list args;
+	int printed = 0;
+
+	va_start(args, fmt);
+	printed = vsprintf(printf_buf, fmt, args);
+	va_end(args);
+	for (int i = 0; i < printed; i++){
+		//Here, this is where we plug out HAL putc
+#ifdef SERIAL_PRESENT
+		hal_io_serial_putc( SerialA, printf_buf[i] );
+#endif
+	}
 
 	return printed;
 }

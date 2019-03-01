@@ -1,8 +1,8 @@
 /*
 * HAL IO (assembly)
 *
-* Adapted From:
-*     https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm
+*  Rafael Roman Otero
+*
 */
 
 .section .text
@@ -15,6 +15,9 @@
 *   HAL IO Video Init
 *
 *   void _hal_io_video_init(void)
+*
+*  From:
+*     https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm
 */
 .globl _hal_io_video_init
 _hal_io_video_init:
@@ -59,6 +62,10 @@ _video_init_success:
 *   HAL IO Video Put Pixel
 *
 *   void _hal_io_video_put_pixel_raw(uint32_t raw_linear_position, Color)
+*
+*  Adapted from:
+*     https://github.com/mmuszkow/NoOsBootstrap/tree/master/arm
+*
 */
 .globl _hal_io_video_put_pixel_raw
 _hal_io_video_put_pixel_raw:
@@ -77,7 +84,7 @@ _hal_io_video_put_pixel_raw:
 
 	@Draw Pixel
 	str color, [fb, #0]
-	str color, [fb, #2]   @This is so that letters look BOLD
+	@str color, [fb, #2]   @This is so that letters look BOLD
 
 	pop {r4-r6, pc}
 

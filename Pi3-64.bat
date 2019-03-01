@@ -7,7 +7,7 @@ REM
 
 @REM COMPILER COMMAND LINE
 @echo off
-set "bindir=C:\Program Files (x86)\GNU ARM AARCH64\bin\"
+set "bindir=C:\Program Files\GNU ARM AARCH64\bin\"
 set "cpuflags=-O3 -march=armv8-a+simd -mtune=cortex-a53 -mstrict-align -fno-tree-loop-vectorize -fno-tree-slp-vectorize"
 set "asmflags=-nostdlib -nostartfiles -ffreestanding -fno-asynchronous-unwind-tables -fomit-frame-pointer -Wa,-a>output/list_rp3.txt"
 set "linkerflags=-Wl,-gc-sections -Wl,--build-id=none -Wl,-Bdynamic -Wl,-Map,output/kernel_rp3.map"
