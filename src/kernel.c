@@ -21,6 +21,10 @@ void input_output_init(void);
 void sys_info( uint8_t* );
 void sd_card_fs_demo();
 
+//todo move this
+//char *append(const char *oldstring, const char c);
+//end of todo
+
 /*
  *		Kernel's entry point
 **/
@@ -30,7 +34,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   kernel_init();
   input_output_init();
 
-  sd_card_fs_demo();   //<<-- Uncomment this to show File System/SD Card demo
+  //sd_card_fs_demo();   //<<-- Uncomment this to show File System/SD Card demo
 
   //Welcome Msg Video
   hal_io_video_puts( "\n\r\n\rWelcome to MiniOS Pi Zero\n\r", 3, VIDEO_COLOR_GREEN );
@@ -40,12 +44,33 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 
   uint8_t c;
 
-	while (1){
-    c = hal_io_serial_getc( SerialA );
+  char input[64];
+  int i = 0;
+  char* ls = "ls\r";
+    char* cd = "cd";
 
-    printf_video( "%c", c );  //<<--- We also have printfs
-    printf_serial( "%c", c );
-  }
+
+    while (1){
+        c = hal_io_serial_getc( SerialA );
+        if(c == '\r') {
+            input[i++] = '\0';
+            if(!strcmp(input, "ls")) {
+                printf_serial("\n%s\n", "maxpooper");
+            } else if (!strcmp(input, "cd")) {
+                printf_serial("\n%s\n", "maxpoopy");
+            } else if(!strcmp(input, "cat")) {
+                printf_serial("\n%s\n", "maxpooped");
+            } else if(!strcmp(input, "sysinfo")) {
+                printf_serial("\n%s\n", "aaron vong");
+            };
+            printf_serial("\n%s\n", input);
+            i = 0;
+        } else {
+            input[i++] = c;
+            printf_video( "%c", c );  //<<--- We also have printfs
+            printf_serial( "%c", c );
+        }
+    }
 
 }
 
