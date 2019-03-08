@@ -34,8 +34,6 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   input_output_init();
   sdInitCard (&printf_serial, &printf_serial, true);
 
-//  sd_card_fs_demo();   //<<-- Uncomment this to show File System/SD Card demo
-
   //Welcome Msg Video
   hal_io_video_puts( "\n\r\n\rWelcome to MiniOS Pi Zero\n\r", 3, VIDEO_COLOR_GREEN );
   hal_io_serial_puts( SerialA, "\n\r\n\rWelcome to MiniOS Pi Zero\n\r" );
@@ -77,7 +75,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				}
 				else {
 					printf_serial("Unable to find file %s", token);
-					printf_video("Unable to find file %s", token);
+					printf_video("\n\r Unable to find file %s", token);
 				}
 				printf_serial("\n");
 			}
@@ -85,20 +83,50 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				printf_serial("yeet");
 			}
             if(!strcmp(input, "ls")) {
-//                printf_serial("\n%s\n", "LS called");
                 /* Display root directory */
                 printf_serial("\n\nDirectory (/): \n");
                 printf_video("\n\r");
                 DisplayDirectory("\\*.*");
-            //} else if (!strcmp(input, "cd")) {
-                //printf_serial("\n\n%s\n", "CD called");
             } else if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
                 printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
-//                printf_serial("\n\n");
-//                sdInitCard (&printf_serial, &printf_serial, true);
             } else if(!strcmp(input, "dump")) {
-                printf_serial("\n\n%s\n", "DUMP called");
+                token = strtok(NULL, " ");
+                printf_serial("\n\r%s", token);
+                printf_serial("\n\n");
+                printf_serial("Dumping %s \n", token);
+
+                HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                if (fHandle != 0) {
+                    uint32_t bytesRead;
+
+                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+                        buffer[bytesRead - 1] = '\0';  ///insert null char
+                        int bin_i = 0;
+
+                        while(buffer[bin_i] != '\0'){
+                            if(bin_i % 16 == 0) {
+                                printf_serial("\n");
+                                printf_video("\n\r");
+                            }
+                            printf_serial("%02x ", buffer[bin_i]);
+                            printf_video("%02x ", buffer[bin_i]);
+                            ++bin_i;
+                        }
+                    }
+                    else {
+                        printf_serial("Failed to read");
+                    }
+
+                    // Close the file
+                    sdCloseHandle(fHandle);
+
+                }
+                else {
+                    printf_serial("Unable to find file %s", token);
+                    printf_video("\n\r Unable to find file %s", token);
+                }
+                printf_serial("\n");
             };
             hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
             printf_serial("\n\r$ " );
@@ -154,44 +182,6 @@ void sys_info( uint8_t* msg ){
   printf_serial( msg );
 }
 
-/////////////////////////////////////////////////////////////////
-////////////////    D E M O    C O D E    ///////////////////////
-/////////////////////////////////////////////////////////////////
-
-//char buffer[500];
-//void DisplayDirectory(const char*);
-
-
-void sd_card_fs_demo(){
-  printf_serial("\n\n");
-  sdInitCard (&printf_serial, &printf_serial, true);
-
-  /* Display root directory */
-  printf_serial("\n\nDirectory (/): \n");
-  DisplayDirectory("\\*.*");
-
-  printf_serial("\n");
-  printf_serial("Opening Alice.txt \n");
-
-  HANDLE fHandle = sdCreateFile("Alice.txt", GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-  if (fHandle != 0) {
-    uint32_t bytesRead;
-
-    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true))  {
-        buffer[bytesRead-1] = '\0';  ///insert null char
-        printf_serial("File Contents: %s", &buffer[0]);
-    }
-    else{
-      printf_serial("Failed to read" );
-    }
-
-    // Close the file
-    sdCloseHandle(fHandle);
-
-  }
-
-}
-
 void DisplayDirectory(const char* dirName) {
 	HANDLE fh;
 	FIND_DATA find;
@@ -212,18 +202,8 @@ void DisplayDirectory(const char* dirName) {
                   find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
                   find.CreateDT.tm_year + 1900,
                   find.cFileName);                                        // Display each entry
-            printf_video("%s\n\r",
-//                          find.cAlternateFileName[0], find.cAlternateFileName[1],
-//                          find.cAlternateFileName[2], find.cAlternateFileName[3],
-//                          find.cAlternateFileName[4], find.cAlternateFileName[5],
-//                          find.cAlternateFileName[6], find.cAlternateFileName[7],
-//                          find.cAlternateFileName[8], find.cAlternateFileName[9],
-//                          find.cAlternateFileName[10],
-//                          (unsigned long) find.nFileSizeLow,
-//                          find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
-//                          find.CreateDT.tm_year + 1900,
-                          find.cFileName);
-        }
+            printf_video("%s\n\r", find.cFileName);
+            }
 		} while (sdFindNextFile(fh, &find) != 0);						// Loop finding next file
 	sdFindClose(fh);												// Close the serach handle
 }
