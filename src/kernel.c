@@ -55,6 +55,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 //                printf_serial("\n%s\n", "LS called");
                 /* Display root directory */
                 printf_serial("\n\nDirectory (/): \n");
+                printf_video("\n\r");
                 DisplayDirectory("\\*.*");
             } else if (!strcmp(input, "cd")) {
                 printf_serial("\n\n%s\n", "CD called");
@@ -70,6 +71,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                     if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true))  {
                         buffer[bytesRead-1] = '\0';  ///insert null char
                         printf_serial("File Contents: %s", &buffer[0]);
+                        printf_video("\n\r%s\n\r", &buffer[0]);
                     }
                     else{
                         printf_serial("Failed to read" );
@@ -82,11 +84,13 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 printf_serial("\n");
             } else if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
+                printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
 //                printf_serial("\n\n");
 //                sdInitCard (&printf_serial, &printf_serial, true);
             } else if(!strcmp(input, "dump")) {
                 printf_serial("\n\n%s\n", "DUMP called");
             };
+            hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
             printf_serial("\n\r$ " );
             i = 0;
         } else {
@@ -186,17 +190,30 @@ void DisplayDirectory(const char* dirName) {
 	do {
 		if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
 			printf_serial("%s <DIR>\n", find.cFileName);
-		else printf_serial("%c%c%c%c%c%c%c%c.%c%c%c Size: %9lu bytes, %2d/%s/%4d, LFN: %s\n",
-			find.cAlternateFileName[0], find.cAlternateFileName[1],
-			find.cAlternateFileName[2], find.cAlternateFileName[3],
-			find.cAlternateFileName[4], find.cAlternateFileName[5],
-			find.cAlternateFileName[6], find.cAlternateFileName[7],
-			find.cAlternateFileName[8], find.cAlternateFileName[9],
-			find.cAlternateFileName[10],
-			(unsigned long)find.nFileSizeLow,
-			find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
-			find.CreateDT.tm_year + 1900,
-			find.cFileName);										// Display each entry
-	} while (sdFindNextFile(fh, &find) != 0);						// Loop finding next file
+		else {
+            printf_serial("%c%c%c%c%c%c%c%c.%c%c%c Size: %9lu bytes, %2d/%s/%4d, LFN: %s\n",
+                  find.cAlternateFileName[0], find.cAlternateFileName[1],
+                  find.cAlternateFileName[2], find.cAlternateFileName[3],
+                  find.cAlternateFileName[4], find.cAlternateFileName[5],
+                  find.cAlternateFileName[6], find.cAlternateFileName[7],
+                  find.cAlternateFileName[8], find.cAlternateFileName[9],
+                  find.cAlternateFileName[10],
+                  (unsigned long) find.nFileSizeLow,
+                  find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
+                  find.CreateDT.tm_year + 1900,
+                  find.cFileName);                                        // Display each entry
+            printf_video("%s\n\r",
+//                          find.cAlternateFileName[0], find.cAlternateFileName[1],
+//                          find.cAlternateFileName[2], find.cAlternateFileName[3],
+//                          find.cAlternateFileName[4], find.cAlternateFileName[5],
+//                          find.cAlternateFileName[6], find.cAlternateFileName[7],
+//                          find.cAlternateFileName[8], find.cAlternateFileName[9],
+//                          find.cAlternateFileName[10],
+//                          (unsigned long) find.nFileSizeLow,
+//                          find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
+//                          find.CreateDT.tm_year + 1900,
+                          find.cFileName);
+        }
+		} while (sdFindNextFile(fh, &find) != 0);						// Loop finding next file
 	sdFindClose(fh);												// Close the serach handle
 }
