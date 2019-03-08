@@ -21,9 +21,8 @@ void input_output_init(void);
 void sys_info( uint8_t* );
 void sd_card_fs_demo();
 
-//todo move this
-//char *append(const char *oldstring, const char c);
-//end of todo
+char buffer[500];
+void DisplayDirectory(const char*);
 
 /*
  *		Kernel's entry point
@@ -33,8 +32,9 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   //Init
   kernel_init();
   input_output_init();
+  sdInitCard (&printf_serial, &printf_serial, true);
 
-  //sd_card_fs_demo();   //<<-- Uncomment this to show File System/SD Card demo
+//  sd_card_fs_demo();   //<<-- Uncomment this to show File System/SD Card demo
 
   //Welcome Msg Video
   hal_io_video_puts( "\n\r\n\rWelcome to MiniOS Pi Zero\n\r", 3, VIDEO_COLOR_GREEN );
@@ -46,24 +46,48 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 
   char input[64];
   int i = 0;
-  char* ls = "ls\r";
-    char* cd = "cd";
-
 
     while (1){
         c = hal_io_serial_getc( SerialA );
         if(c == '\r') {
             input[i++] = '\0';
             if(!strcmp(input, "ls")) {
-                printf_serial("\n%s\n", "maxpooper");
+//                printf_serial("\n%s\n", "LS called");
+                /* Display root directory */
+                printf_serial("\n\nDirectory (/): \n");
+                DisplayDirectory("\\*.*");
             } else if (!strcmp(input, "cd")) {
-                printf_serial("\n%s\n", "maxpoopy");
+                printf_serial("\n\n%s\n", "CD called");
             } else if(!strcmp(input, "cat")) {
-                printf_serial("\n%s\n", "maxpooped");
+//                printf_serial("\n%s\n", "CAT called");
+                printf_serial("\n\n");
+                printf_serial("Opening Alice.txt \n");
+
+                HANDLE fHandle = sdCreateFile("Alice.txt", GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                if (fHandle != 0) {
+                    uint32_t bytesRead;
+
+                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true))  {
+                        buffer[bytesRead-1] = '\0';  ///insert null char
+                        printf_serial("File Contents: %s", &buffer[0]);
+                    }
+                    else{
+                        printf_serial("Failed to read" );
+                    }
+
+                    // Close the file
+                    sdCloseHandle(fHandle);
+
+                }
+                printf_serial("\n");
             } else if(!strcmp(input, "sysinfo")) {
-                printf_serial("\n%s\n", "aaron vong");
+                printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
+//                printf_serial("\n\n");
+//                sdInitCard (&printf_serial, &printf_serial, true);
+            } else if(!strcmp(input, "dump")) {
+                printf_serial("\n\n%s\n", "DUMP called");
             };
-            printf_serial("\n%s\n", input);
+            printf_serial("\n\r$ " );
             i = 0;
         } else {
             input[i++] = c;
@@ -120,8 +144,8 @@ void sys_info( uint8_t* msg ){
 ////////////////    D E M O    C O D E    ///////////////////////
 /////////////////////////////////////////////////////////////////
 
-char buffer[500];
-void DisplayDirectory(const char*);
+//char buffer[500];
+//void DisplayDirectory(const char*);
 
 
 void sd_card_fs_demo(){
