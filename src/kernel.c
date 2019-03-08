@@ -51,37 +51,47 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
         c = hal_io_serial_getc( SerialA );
         if(c == '\r') {
             input[i++] = '\0';
+			char* token = strtok(input, " ");
+			if (!strcmp(token, "cat")) {
+				token = strtok(NULL, " ");
+				printf_serial("\n\r%s", token);
+				printf_serial("\n\n");
+				printf_serial("Opening %s \n", token);
+
+				HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+				if (fHandle != 0) {
+					uint32_t bytesRead;
+
+					if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+						buffer[bytesRead - 1] = '\0';  ///insert null char
+						printf_serial("File Contents: %s", &buffer[0]);
+						printf_video("\n\r%s\n\r", &buffer[0]);
+					}
+					else {
+						printf_serial("Failed to read");
+					} 
+
+					// Close the file
+					sdCloseHandle(fHandle);
+
+				}
+				else {
+					printf_serial("Unable to find file %s", token);
+					printf_video("Unable to find file %s", token);
+				}
+				printf_serial("\n");
+			}
+			if (!strcmp(input, "cd")) {
+				printf_serial("yeet");
+			}
             if(!strcmp(input, "ls")) {
 //                printf_serial("\n%s\n", "LS called");
                 /* Display root directory */
                 printf_serial("\n\nDirectory (/): \n");
                 printf_video("\n\r");
                 DisplayDirectory("\\*.*");
-            } else if (!strcmp(input, "cd")) {
-                printf_serial("\n\n%s\n", "CD called");
-            } else if(!strcmp(input, "cat")) {
-//                printf_serial("\n%s\n", "CAT called");
-                printf_serial("\n\n");
-                printf_serial("Opening Alice.txt \n");
-
-                HANDLE fHandle = sdCreateFile("Alice.txt", GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-                if (fHandle != 0) {
-                    uint32_t bytesRead;
-
-                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true))  {
-                        buffer[bytesRead-1] = '\0';  ///insert null char
-                        printf_serial("File Contents: %s", &buffer[0]);
-                        printf_video("\n\r%s\n\r", &buffer[0]);
-                    }
-                    else{
-                        printf_serial("Failed to read" );
-                    }
-
-                    // Close the file
-                    sdCloseHandle(fHandle);
-
-                }
-                printf_serial("\n");
+            //} else if (!strcmp(input, "cd")) {
+                //printf_serial("\n\n%s\n", "CD called");
             } else if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
                 printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
