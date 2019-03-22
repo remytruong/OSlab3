@@ -1,0 +1,1 @@
+qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel output/kernel.elf -drive file=SDCard/SDCard.img,if=sd,format=raw
