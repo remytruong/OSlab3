@@ -2,3 +2,5 @@ SDCard/*.img
 .idea/
 .vs/
 .vscode/
+*.elf
+output/*.elf

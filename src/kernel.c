@@ -35,16 +35,19 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   input_output_init();
   sdInitCard (&printf_serial, &printf_serial, true);
 
+  char input[64];
+  int i = 0;
+  char folder[300];
+  strcpy(folder, "");
+  char dest[200];
   //Welcome Msg Video
   hal_io_video_puts( "\n\r\n\rWelcome to MiniOS Pi Zero\n\r", 3, VIDEO_COLOR_GREEN );
   hal_io_serial_puts( SerialA, "\n\r\n\rWelcome to MiniOS Pi Zero\n\r" );
   hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
-  hal_io_serial_puts( SerialA, "\n\r$ " );
+  printf_video("%s ", folder);
+  printf_serial("\n\r$ %s ", folder);
 
   uint8_t c;
-
-  char input[64];
-  int i = 0;
 
     while (1){
         c = hal_io_serial_getc( SerialA );
@@ -117,8 +120,11 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				printf_serial("\n\r%s", token);
 				printf_serial("\n\n");
 				printf_serial("Opening %s \n", token);
-
-				HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+				char temp[200];
+				strcpy(temp, dest);
+				strcat(temp, "\\");
+				strcat(temp, token);
+				HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 				if (fHandle != 0) {
 					uint32_t bytesRead;
 
@@ -142,13 +148,40 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				printf_serial("\n");
 			}
 			if (!strcmp(input, "cd")) {
-				printf_serial("yeet");
+				token = strtok(NULL, " ");
+				if (!strcmp(token, "..")) {
+					size_t startpoint = strlen(dest);
+					for (size_t i = startpoint; i >= 0; --i) {
+						if (dest[i] == '\\') {
+							char test[500];
+							strcpy(test, dest);
+							strcpy(dest, "");
+							for (size_t d = 0; d < i; d++) {
+								dest[d] = test[d];
+							}
+							dest[i] = '\0';
+							break;
+						}
+						if (i == 0) {
+							strcpy(dest, "");
+						}
+					}
+				}
+				else {
+					strcat(dest, "\\");
+					strcat(dest, token);
+					printf_serial("\n\n");
+					printf_serial("cding to %s \n", token);
+				}
 			}
             if(!strcmp(input, "ls")) {
-                /* Display root directory */
-                printf_serial("\n\nDirectory (/): \n");
+                printf_serial("\n\nDirectory (%s): \n", folder);
                 printf_video("\n\r");
-                DisplayDirectory("\\*.*");
+				char directory[500];
+				strcpy(directory, "");
+				strcat(directory, dest);
+				strcat(directory, "\\*.*");
+                DisplayDirectory(directory);
             } else if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
                 printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
@@ -158,7 +191,12 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 printf_serial("\n\n");
                 printf_serial("Dumping %s \n", token);
 
-                HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+				char temp[200];
+				strcpy(temp, dest);
+				strcat(temp, "\\");
+				strcat(temp, token);
+				
+				HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
                 if (fHandle != 0) {
                     uint32_t bytesRead;
 
@@ -191,7 +229,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 printf_serial("\n");
             };
             hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
-            printf_serial("\n\r$ " );
+			printf_video("%s ", folder);
+            printf_serial("\n\r$ %s ", folder );
             i = 0;
         } else {
             input[i++] = c;
