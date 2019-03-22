@@ -30,7 +30,7 @@
 #include <stdint.h>								// Needed for uint8_t, uint32_t, uint64_t etc
 #include <stdarg.h>								// Needed for variadic arguments
 #include <string.h>								// Needed for strlen
-#include "rpi-SmartStart.h"						// This units header
+#include "rpi-smartstart.h"						// This units header
 #include "../../hal/hal.h"
 
 /***************************************************************************}
