@@ -22,7 +22,7 @@ Write-Host "Building..."
   src/drivers/smartstart/rpi-SmartStart.c `
 	src/hal/hal_io.c src/kernel.c `
 	src/hal/fonts.c `
-	src/loader/loader.c `
+	src/console/console.c `
   -o output/kernel.elf `
 	-O0	`
 	-lc -lm -lg -lgcc
