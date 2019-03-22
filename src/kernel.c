@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #include "kernel.h"
 #include "hal/hal.h"
@@ -50,6 +51,67 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
         if(c == '\r') {
             input[i++] = '\0';
 			char* token = strtok(input, " ");
+
+      if(!strcmp(token, "evit")) {
+        char buffer[32767];
+        int cursor = 0;
+        int eof = 1;
+        buffer[cursor] = '_';
+        buffer[eof] = '\0';
+        hal_io_clear_screen();
+        printf_video(buffer);
+
+        int terminate = 0;
+        while(!terminate) {
+          c = hal_io_serial_getc( SerialA );
+          if (c == 27) {
+            c = hal_io_serial_getc( SerialA );
+            c = hal_io_serial_getc( SerialA );
+            if (c == 'C') {
+              printf_serial(" >");
+              if (cursor < eof - 1) {
+                buffer[cursor] = buffer[cursor+1];
+                buffer[++cursor] = '_';
+              }
+            }
+            else if (c == 'D') {
+              printf_serial(" <");
+              if (cursor > 0) {
+                buffer[cursor] = buffer[cursor-1];
+                buffer[--cursor] = '_';
+              }
+            }
+            else {
+              terminate = 1;
+            }
+          }
+          else if (c == 127) {
+            printf_serial(" BS");
+            for(int it = cursor; it <= eof; ++it) {
+              buffer[it - 1] = buffer[it];
+            }
+            --cursor;
+          }
+          else {
+            ++eof;
+            for(int it = eof; it > cursor; --it) {
+              buffer[it] = buffer[it-1];
+            }
+            buffer[cursor++] = c;
+            if (c == '\r') {
+              ++eof;
+              for(int it = eof; it > cursor; --it) {
+                buffer[it] = buffer[it-1];
+              }
+              buffer[cursor++] = '\n';
+            }
+            buffer[eof] = '\0';
+          }
+          hal_io_clear_screen();
+          printf_video(buffer);
+        }
+      }
+
 			if (!strcmp(token, "cat")) {
 				token = strtok(NULL, " ");
 				printf_serial("\n\r%s", token);
@@ -136,6 +198,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
             printf_video( "%c", c );  //<<--- We also have printfs
             printf_serial( "%c", c );
         }
+        
     }
 
 }

@@ -408,8 +408,9 @@ uint64_t timer_getTickCount (void) {
 . 02Jul17 LdB
 .--------------------------------------------------------------------------*/
 void timer_wait (uint64_t us) {
-	us += timer_getTickCount();										// Add current tickcount onto delay
-	while (timer_getTickCount() < us) {};							// Loop on timeout function until timeout
+  for(volatile int i = 0; i < 1000; ++i);
+	// us += timer_getTickCount();										// Add current tickcount onto delay
+	// while (timer_getTickCount() < us) {};							// Loop on timeout function until timeout
 }
 
 
