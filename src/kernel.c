@@ -62,7 +62,6 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				strcpy(temp, dest);
 				strcat(temp, "\\");
 				strcat(temp, token);
-				printf_serial("%s", temp);
 				HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 				if (fHandle != 0) {
 					uint32_t bytesRead;
@@ -134,7 +133,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				strcpy(temp, dest);
 				strcat(temp, "\\");
 				strcat(temp, token);
-				printf_serial("%s", temp);
+				
 				HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
                 if (fHandle != 0) {
                     uint32_t bytesRead;
