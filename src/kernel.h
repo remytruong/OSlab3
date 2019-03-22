@@ -1,8 +1,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#define OS_NAME     "MiniOS"
-#define OS_VERSION  "3 (Pi Zero)"
+#define OS_NAME     "O OS"
+#define OS_VERSION  "Version: 0.0"
 
 /*
 *  HERE YOU CONTORL WHAT'S ENBALED OR NOTE

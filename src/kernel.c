@@ -87,10 +87,12 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 printf_serial("\n\nDirectory (/): \n");
                 printf_video("\n\r");
                 DisplayDirectory("\\*.*");
-            } else if(!strcmp(input, "sysinfo")) {
+            }
+            if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
                 printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
-            } else if(!strcmp(input, "dump")) {
+            }
+            if(!strcmp(input, "dump")) {
                 token = strtok(NULL, " ");
                 printf_serial("\n\r%s", token);
                 printf_serial("\n\n");
@@ -127,7 +129,46 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                     printf_video("\n\r Unable to find file %s", token);
                 }
                 printf_serial("\n");
-            };
+            }
+//            TODO: REMOVE - placeholder for running file in question 3
+            if(!strcmp(input, "test")) {
+                token = strtok(NULL, " ");
+                printf_serial("\n\r%s", token);
+                printf_serial("\n\n");
+                printf_serial("Opening %s \n", token);
+
+                HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                if (fHandle != 0) {
+                    uint32_t bytesRead;
+
+                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+                        buffer[bytesRead - 1] = '\0';  ///insert null char
+                        int bin_i = 0;
+
+                        while(buffer[bin_i] != '\0'){
+                            if(bin_i % 16 == 0) {
+                                printf_serial("\n");
+                                printf_video("\n\r");
+                            }
+                            printf_serial("%02x ", buffer[bin_i]);
+                            printf_video("%02x ", buffer[bin_i]);
+                            ++bin_i;
+                        }
+                    }
+                    else {
+                        printf_serial("Failed to read");
+                    }
+
+                    // Close the file
+                    sdCloseHandle(fHandle);
+
+                }
+                else {
+                    printf_serial("Unable to find file %s", token);
+                    printf_video("\n\r Unable to find file %s", token);
+                }
+                printf_serial("\n");
+            }
             hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
             printf_serial("\n\r$ " );
             i = 0;
