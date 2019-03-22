@@ -188,8 +188,10 @@ void DisplayDirectory(const char* dirName) {
 	char* month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 	fh = sdFindFirstFile(dirName, &find);							// Find first file
 	do {
-		if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
-			printf_serial("%s <DIR>\n", find.cFileName);
+		if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY) {
+            printf_serial("%s <DIR>\n", find.cFileName);
+            printf_video("%s\n\r", find.cFileName);
+        }
 		else {
             printf_serial("%c%c%c%c%c%c%c%c.%c%c%c Size: %9lu bytes, %2d/%s/%4d, LFN: %s\n",
                   find.cAlternateFileName[0], find.cAlternateFileName[1],
