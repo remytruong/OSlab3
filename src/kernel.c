@@ -182,10 +182,12 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				strcat(directory, dest);
 				strcat(directory, "\\*.*");
                 DisplayDirectory(directory);
-            } else if(!strcmp(input, "sysinfo")) {
+            }
+            if(!strcmp(input, "sysinfo")) {
                 printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
                 printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
-            } else if(!strcmp(input, "dump")) {
+            }
+            if(!strcmp(input, "dump")) {
                 token = strtok(NULL, " ");
                 printf_serial("\n\r%s", token);
                 printf_serial("\n\n");
@@ -227,12 +229,42 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                     printf_video("\n\r Unable to find file %s", token);
                 }
                 printf_serial("\n");
-            };
+            }
+//            TODO: REMOVE - placeholder for running file in question 3
+            else if(!strcmp(input, "test")) {
+                token = strtok(NULL, " ");
+                printf_serial("\n\r%s", token);
+                printf_serial("\n\n");
+                printf_serial("Opening %s \n", token);
+
+                HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                if (fHandle != 0) {
+                    uint32_t bytesRead;
+
+                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+                        int ret = ((int(*)(void))(buffer))();
+                        printf_serial("%d",ret);
+                    }
+                    else {
+                        printf_serial("Failed to read");
+                    }
+
+                    // Close the file
+                    sdCloseHandle(fHandle);
+
+                }
+                else {
+                    printf_serial("Unable to find file %s", token);
+                    printf_video("\n\r Unable to find file %s", token);
+                }
+                printf_serial("\n");
+            }
             hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
 			printf_video("%s ", folder);
             printf_serial("\n\r$ %s ", folder );
             i = 0;
-        } else {
+        }
+        else {
             input[i++] = c;
             printf_video( "%c", c );  //<<--- We also have printfs
             printf_serial( "%c", c );

@@ -11,6 +11,12 @@
 #define HAL_SUCCESS  0
 #define HAL_FAILED  1
 
+//typedef struct{
+//    tMemRegionId    id;
+//    uint8_t*        base;
+//    uint32_t        size;
+//}tMemRegion;
+
 ///
 ///  V I D E O
 ///
