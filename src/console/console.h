@@ -1,6 +1,8 @@
-//#ifndef CONSOLE_H
-//#define CONSOLE_H
-//
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
-//
-//#endif
+void run();
+void sys_info( uint8_t*);
+void DisplayDirectory(const char*);
+
+#endif

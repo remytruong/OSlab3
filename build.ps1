@@ -36,7 +36,7 @@ Write-Host "Building..."
     -o output/Test.elf
 
 
-& 'C:\Program Files (x86)\GNU Tools ARM Embedded\8 2018-q4-major\bin\arm-none-eabi-objcopy.exe' kernel.elf -O binary kernel.img
+& 'C:\Program Files (x86)\GNU Tools ARM Embedded\8 2018-q4-major\bin\arm-none-eabi-objcopy.exe' output/kernel.elf -O binary kernel.img
 
 & 'C:\Program Files (x86)\GNU Tools ARM Embedded\8 2018-q4-major\bin\arm-none-eabi-objcopy.exe' output/Test.elf -O binary output/Test.bin
 
