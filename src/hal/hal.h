@@ -11,6 +11,12 @@
 #define HAL_SUCCESS  0
 #define HAL_FAILED  1
 
+//typedef struct{
+//    tMemRegionId    id;
+//    uint8_t*        base;
+//    uint32_t        size;
+//}tMemRegion;
+
 ///
 ///  V I D E O
 ///
@@ -62,11 +68,5 @@ void hal_io_serial_init( void );
 void hal_io_serial_putc( SerialId, uint8_t );
 uint8_t hal_io_serial_getc( SerialId );
 void hal_io_serial_puts( SerialId, uint8_t* );
-
-//typedef struct{
-//    tMemRegionId    id;
-//    uint8_t*        base;
-//    uint32_t        size;
-//}tMemRegion;
 
 #endif

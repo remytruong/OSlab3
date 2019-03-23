@@ -169,7 +169,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 printf_serial("\n");
             }
 //            TODO: REMOVE - placeholder for running file in question 3
-            if(!strcmp(input, "test")) {
+            else if(!strcmp(input, "test")) {
                 token = strtok(NULL, " ");
                 printf_serial("\n\r%s", token);
                 printf_serial("\n\n");
@@ -180,18 +180,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                     uint32_t bytesRead;
 
                     if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
-                        buffer[bytesRead - 1] = '\0';  ///insert null char
-                        int bin_i = 0;
-
-                        while(buffer[bin_i] != '\0'){
-                            if(bin_i % 16 == 0) {
-                                printf_serial("\n");
-                                printf_video("\n\r");
-                            }
-                            printf_serial("%02x ", buffer[bin_i]);
-                            printf_video("%02x ", buffer[bin_i]);
-                            ++bin_i;
-                        }
+                        int ret = ((int(*)(void))(buffer))();
+                        printf_serial("%d",ret);
                     }
                     else {
                         printf_serial("Failed to read");
@@ -211,7 +201,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 			printf_video("%s ", folder);
             printf_serial("\n\r$ %s ", folder );
             i = 0;
-        } else {
+        }
+        else {
             input[i++] = c;
             printf_video( "%c", c );  //<<--- We also have printfs
             printf_serial( "%c", c );
