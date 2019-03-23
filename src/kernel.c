@@ -46,7 +46,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
   printf_video("%s ", folder);
   printf_serial("\n\r$ %s ", folder);
-
+  char runnable[4] = ".bin";
   uint8_t c;
 
     while (1){
@@ -55,7 +55,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
             input[i++] = '\0';
 			char* token = strtok(input, " ");
 
-      if(!strcmp(token, "evit")) {
+      if(!strcmp(input, "evit")) {
         char buffer[32767];
         int cursor = 0;
         int eof = 1;
@@ -230,14 +230,11 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 }
                 printf_serial("\n");
             }
-//            TODO: REMOVE - placeholder for running file in question 3
-            else if(!strcmp(input, "test")) {
-                token = strtok(NULL, " ");
-                printf_serial("\n\r%s", token);
+            else if(!strcmp(&input[strlen(input)-4], runnable)) {
                 printf_serial("\n\n");
-                printf_serial("Opening %s \n", token);
+                printf_serial("Running %s: \n", input);
 
-                HANDLE fHandle = sdCreateFile(token, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                HANDLE fHandle = sdCreateFile(input, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
                 if (fHandle != 0) {
                     uint32_t bytesRead;
 
@@ -254,8 +251,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 
                 }
                 else {
-                    printf_serial("Unable to find file %s", token);
-                    printf_video("\n\r Unable to find file %s", token);
+                    printf_serial("Unable to find file %s", input);
+                    printf_video("\n\r Unable to find file %s", input);
                 }
                 printf_serial("\n");
             }
