@@ -517,4 +517,11 @@ font.lines[3] = (VideoLine){
 char_font_map['$'] = font;
 
 
+// -- UNDERSCORE --
+font.num_lines  = 1;
+font.lines[0] = (VideoLine){ 	.init = (VideoXY){ .x=0, .y=0 }, 		.end = (VideoXY){ .x=BOX_WIDTH, .y=0 } };
+
+char_font_map['_'] = font;
+
+
 }
