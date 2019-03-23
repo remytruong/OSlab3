@@ -191,6 +191,8 @@ void hal_io_clear_screen( void ){
 			_hal_io_video_put_pixel_raw(  x_y_to_raw(x,y), VIDEO_COLOR_BLACK );
 		}
 	}
+  curr_x=X_ORIGIN;
+  curr_y=Y_ORIGIN;
 }
 
 static uint32_t x_y_to_raw(uint32_t x, uint32_t y){
