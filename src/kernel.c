@@ -17,6 +17,8 @@
 #include "drivers/stdio/emb-stdio.h"			// Needed for printf
 #include "drivers/sdcard/SDCard.h"
 
+#include "console/console.h"
+
 void kernel_init(void);
 void input_output_init(void);
 void sys_info( uint8_t* );
@@ -34,6 +36,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
   kernel_init();
   input_output_init();
   sdInitCard (&printf_serial, &printf_serial, true);
+
+//  run();
 
   char input[64];
   int i = 0;
@@ -114,7 +118,6 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
           printf_video(buffer);
         }
       }
-
 			if (!strcmp(token, "cat")) {
 				token = strtok(NULL, " ");
 				printf_serial("\n\r%s", token);
@@ -135,7 +138,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 					}
 					else {
 						printf_serial("Failed to read");
-					} 
+					}
 
 					// Close the file
 					sdCloseHandle(fHandle);
@@ -184,8 +187,8 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
                 DisplayDirectory(directory);
             }
             if(!strcmp(input, "sysinfo")) {
-                printf_serial("\n\n%s\n", "OS Name: O OS\nVersion: 0.0");
-                printf_video("\n\r%s\n\r", "OS Name: O OS\n\rVersion: 0.0");
+                sys_info(OS_NAME);
+                sys_info(OS_VERSION);
             }
             if(!strcmp(input, "dump")) {
                 token = strtok(NULL, " ");
@@ -197,7 +200,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
 				strcpy(temp, dest);
 				strcat(temp, "\\");
 				strcat(temp, token);
-				
+
 				HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
                 if (fHandle != 0) {
                     uint32_t bytesRead;
@@ -266,7 +269,7 @@ void main(uint32_t r0, uint32_t r1, uint32_t atags){
             printf_video( "%c", c );  //<<--- We also have printfs
             printf_serial( "%c", c );
         }
-        
+
     }
 
 }
@@ -306,37 +309,4 @@ void input_output_init(void){
     sys_info( "Video Init Failed [x]\n\r" );
 
     sys_info( "Serial Initialized\n\r" );
-}
-
-void sys_info( uint8_t* msg ){
-  printf_video( msg );
-  printf_serial( msg );
-}
-
-void DisplayDirectory(const char* dirName) {
-	HANDLE fh;
-	FIND_DATA find;
-	char* month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-	fh = sdFindFirstFile(dirName, &find);							// Find first file
-	do {
-		if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY) {
-            printf_serial("%s <DIR>\n", find.cFileName);
-            printf_video("%s\n\r", find.cFileName);
-        }
-		else {
-            printf_serial("%c%c%c%c%c%c%c%c.%c%c%c Size: %9lu bytes, %2d/%s/%4d, LFN: %s\n",
-                  find.cAlternateFileName[0], find.cAlternateFileName[1],
-                  find.cAlternateFileName[2], find.cAlternateFileName[3],
-                  find.cAlternateFileName[4], find.cAlternateFileName[5],
-                  find.cAlternateFileName[6], find.cAlternateFileName[7],
-                  find.cAlternateFileName[8], find.cAlternateFileName[9],
-                  find.cAlternateFileName[10],
-                  (unsigned long) find.nFileSizeLow,
-                  find.CreateDT.tm_mday, month[find.CreateDT.tm_mon],
-                  find.CreateDT.tm_year + 1900,
-                  find.cFileName);                                        // Display each entry
-            printf_video("%s\n\r", find.cFileName);
-            }
-		} while (sdFindNextFile(fh, &find) != 0);						// Loop finding next file
-	sdFindClose(fh);												// Close the serach handle
 }
