@@ -3,9 +3,20 @@
 #include <ctype.h>								// Needed for toupper for wildcard string match
 #include <wchar.h>								// Needed for UTF for long file name support
 #include <string.h>								// Needed for string copy
-#include "../../boot/rpi-smartstart.h"	// Provides all basic hardware access
+#include "../smartstart/rpi-smartstart.h"			// Provides all basic hardware access
 #include "../stdio/emb-stdio.h"							// Provides printf functionality
 #include "SDCard.h"								// This units header
+
+
+
+//======================================================================
+// I harcoded this. SmartStart.S tried to get this dynamically, but
+//that'd mean porting that .S file, so instead, here it is.
+//
+//Rafael
+uint32_t RPi_IO_Base_Addr = 0x3f000000;
+//======================================================================
+
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 {																			}
@@ -492,8 +503,9 @@ struct __attribute__((__packed__, aligned(4))) regCID {
 /*-------------------------------------------------------------------------*/
 #include <assert.h>								// Need for compile time static_assert
 
+//HERE HERE UNCOMMENT THIS
 /* Check the main register section group sizes */
-static_assert(sizeof(struct regBLKSIZECNT) == 0x04, "EMMC register BLKSIZECNT should be 0x04 bytes in size");
+/*static_assert(sizeof(struct regBLKSIZECNT) == 0x04, "EMMC register BLKSIZECNT should be 0x04 bytes in size");
 static_assert(sizeof(struct regCMDTM) == 0x04, "EMMC register CMDTM should be 0x04 bytes in size");
 static_assert(sizeof(struct regSTATUS) == 0x04, "EMMC register STATUS should be 0x04 bytes in size");
 static_assert(sizeof(struct regCONTROL0) == 0x04, "EMMC register CONTROL0 should be 0x04 bytes in size");
@@ -508,6 +520,7 @@ static_assert(sizeof(struct regSLOTISR_VER) == 0x04, "EMMC register SLOTISR_VER 
 static_assert(sizeof(struct regOCR) == 0x04, "EMMC register OCR should be 0x04 bytes in size");
 static_assert(sizeof(struct regSCR) == 0x08, "EMMC register SCR should be 0x08 bytes in size");
 static_assert(sizeof(struct regCID) == 0x10, "EMMC register CID should be 0x10 bytes in size");
+*/
 
 /*--------------------------------------------------------------------------}
 {			  INTERRUPT REGISTER TURN TO MASK BIT DEFINITIONS			    }

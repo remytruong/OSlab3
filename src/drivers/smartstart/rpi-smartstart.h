@@ -35,7 +35,6 @@ extern "C" {									// Put extern C directive wrapper around
 #include <stdbool.h>							// Needed for bool and true/false
 #include <stdint.h>								// Needed for uint8_t, uint32_t, etc
 
-
 /***************************************************************************}
 {		  PUBLIC MACROS MUCH AS WE HATE THEM SOMETIMES YOU NEED THEM        }
 {***************************************************************************/
@@ -45,20 +44,10 @@ extern "C" {									// Put extern C directive wrapper around
 #define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
-/* As we are compiling for Raspberry Pi if main, winmain make them kernel_main */
-#define WinMain(...) kernel_main (uint32_t r0, uint32_t r1, uint32_t atags)
-#define main(...) kernel_main (uint32_t r0, uint32_t r1, uint32_t atags)
-
-/* System font is 8 wide and 16 height so these are preset for the moment */
-#define BitFontHt 16
-#define BitFontWth 8
 
 /* print handler function proto type */
 /* you can make a UART or SCREEN version and direct output to that call */
 typedef int (*printhandler) (const char *fmt, ...);
-
-
-void SmartStartPutPixelRaw( printhandler, uint32_t, uint32_t);
 
 /***************************************************************************}
 {					     PUBLIC ENUMERATION CONSTANTS			            }
@@ -483,6 +472,10 @@ bool ARM_setmaxspeed (printhandler prn_handler);
 .--------------------------------------------------------------------------*/
 void displaySmartStart (printhandler prn_handler);
 
+
+
+
+
 typedef int32_t		BOOL;							// BOOL is defined to an int32_t ... yeah windows is weird -1 is often returned
 typedef char		TCHAR;							// TCHAR is a char
 typedef uint32_t	COLORREF;						// COLORREF is a uint32_t
@@ -572,70 +565,7 @@ typedef struct __attribute__((__packed__, aligned(1))) tagBITMAPINFOHEADER {
 } BITMAPINFOHEADER;
 
 
-/*--------------------------------------------------------------------------}
-{					 CODE TYPE STRUCTURE COMPILE TIME CHECKS	            }
-{--------------------------------------------------------------------------*/
-/* If you have never seen compile time assertions it's worth google search */
-/* on "Compile Time Assertions". It is part of the C11++ specification and */
-/* all compilers that support the standard will have them (GCC, MSC inc)   */
-/*-------------------------------------------------------------------------*/
-#include <assert.h>								// Need for compile time static_assert
 
-/* Check the code type structure size */
-static_assert(sizeof(RGB) == 0x03, "Structure RGB should be 0x03 bytes in size");
-static_assert(sizeof(RGBQUAD) == 0x04, "Structure RGBQUAD should be 0x04 bytes in size");
-static_assert(sizeof(RGBA) == 0x04, "Structure RGBA should be 0x04 bytes in size");
-static_assert(sizeof(RGB565) == 0x02, "Structure RGB565 should be 0x02 bytes in size");
-
-bool PiConsole_Init(int Width, int Height, int Depth, printhandler prn_handler);
-void WriteText(int x, int y, char* txt);
-void Embedded_Console_WriteChar (char Ch);
-
-HDC GetConsoleDC(void);
-uint32_t GetConsole_FrameBuffer(void);
-uint32_t GetConsole_Width (void);
-uint32_t GetConsole_Height (void);
-
-COLORREF SetDCPenColor(HDC      hdc,							// Handle to the DC
-					  COLORREF crColor);						// The new pen color
-
-COLORREF SetDCBrushColor(HDC      hdc,						// Handle to the DC
-	COLORREF crColor);					// The new brush color
-
-BOOL MoveToEx(HDC hdc,
-	int_fast32_t X,
-	int_fast32_t Y,
-	POINT* lpPoint);
-
-BOOL LineTo(HDC hdc,
-	int nXEnd,
-	int nYEnd);
-
-BOOL TextOut(HDC				hdc,
-	int_fast32_t     nXStart,
-	int_fast32_t     nYStart,
-	const TCHAR*		lpString,
-	int_fast32_t     cchString);
-
-BOOL Rectangle(HDC hdc,
-	int_fast32_t nLeftRect,
-	int_fast32_t nTopRect,
-	int_fast32_t nRightRect,
-	int_fast32_t nBottomRect);
-
-BOOL BmpOut(HDC hdc,
-	uint32_t nXStart,
-	uint32_t nYStart,
-	uint32_t cX,
-	uint32_t cY,
-	uint8_t* imgSrc);
-
-BOOL CvtBmpLine(HDC hdc,
-	uint32_t nXStart,
-	uint32_t nYStart,
-	uint32_t cX,
-	uint32_t imgDepth,
-	uint8_t* imgSrc);
 
 #include <sys/types.h>
 caddr_t __attribute__((weak)) _sbrk(int incr);

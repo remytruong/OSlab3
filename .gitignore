@@ -1,2 +1,6 @@
-*.ps1
 SDCard/*.img
+.idea/
+.vs/
+.vscode/
+*.elf
+output/*.elf

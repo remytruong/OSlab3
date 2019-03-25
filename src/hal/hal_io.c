@@ -2,14 +2,12 @@
 *  HAL IO
 *
 *	 Rafael Roman Otero
-*
 */
 
 #include <stdint.h>
 #include "hal.h"
 #include "fonts.h"
-#include "../boot/rpi-smartstart.h"
-
+#include "../drivers/stdio/emb-stdio.h"
 
 static void uart0_init(void);
 static void uart0_putc(uint8_t);
@@ -38,12 +36,8 @@ void hal_io_init( void ){
 *  HAL IO Video Init
 */
 uint32_t hal_io_video_init( void ){
-	//return _hal_io_video_init();   <<<---- This is defined in ARM assembly,
-	//																			 any 32-bit assembly will break
-	//																			 the build
-	return 1;
+	return _hal_io_video_init();
 }
-
 
 /*
 *  HAL IO Video Puts
@@ -59,28 +53,53 @@ void hal_io_video_puts( uint8_t* string, uint32_t size, VideoColor color ){
 *
 */
 #define X_ORIGIN 	VIDEO_CHARACTER_WIDTH
-#define Y_ORIGIN  VIDEO_CHARACTER_HEIGHT*2
+#define Y_ORIGIN  VIDEO_CHARACTER_HEIGHT*3
 uint32_t curr_x=X_ORIGIN;
 uint32_t curr_y=Y_ORIGIN;
 void hal_io_video_putc( uint8_t c, uint32_t size, VideoColor color  ){
 
 	if( c == '\n' ){
+
+			//Is there space for a new line?
+			if(  curr_y >= VIDEO_MAX_Y - VIDEO_CHARACTER_HEIGHT*size - VIDEO_CHARACTER_VERTICAL_SPACE ){
+				//No. Clear screen and go to origin
+				hal_io_clear_screen();
+				curr_x = X_ORIGIN;
+				curr_y = Y_ORIGIN;
+
+				return;
+			}
+
+			//Go new line
 			curr_y = ( curr_y
-				 				+ VIDEO_CHARACTER_HEIGHT*size
-								+ VIDEO_CHARACTER_VERTICAL_SPACE ) %  (VIDEO_MAX_Y-VIDEO_CHARACTER_HEIGHT);
+							+ VIDEO_CHARACTER_HEIGHT*size
+							+ VIDEO_CHARACTER_VERTICAL_SPACE );
+
 			return;
 	}
-	if( c == '\r' ){
+	else if( c == '\r' ){
+			//carriage return
 			curr_x = X_ORIGIN;
 			return;
 	}
+	else{
 
-	hal_io_video_putc_x_y( curr_x, curr_y, c, size, color );
+			//Will the charatacer fit in the current line?
+			if(  curr_x >= VIDEO_MAX_X - VIDEO_CHARACTER_WIDTH*size - VIDEO_CHARACTER_HORIZONTAL_SPACE ){
+				//No. Go next line.
+				hal_io_video_putc( '\r', size, color );
+				hal_io_video_putc( '\n', size, color );
+			}
 
-	//Move cursor
-	curr_x = ( curr_x
-						+ VIDEO_CHARACTER_WIDTH*size
-						+ VIDEO_CHARACTER_HORIZONTAL_SPACE*size )  % (VIDEO_MAX_X-VIDEO_CHARACTER_WIDTH);
+			//Write the character
+			hal_io_video_putc_x_y( curr_x, curr_y, c, size, color );
+
+			//Move X cursor
+			curr_x = ( curr_x
+							+ VIDEO_CHARACTER_WIDTH*size
+							+ VIDEO_CHARACTER_HORIZONTAL_SPACE );
+	}
+
 }
 
 /*
@@ -89,14 +108,14 @@ void hal_io_video_putc( uint8_t c, uint32_t size, VideoColor color  ){
 */
 void hal_io_video_putc_x_y( uint32_t x, uint32_t y, uint8_t c, uint32_t size, VideoColor color  ){
 
-	if( !fonts_is_implemented(c) ){
+	//We dont need thispart anymore, this is handled by printg other character nbow
+	//but I leave it here, so I can remove all this function altogether later.
+
+	/*if( !fonts_is_implemented(c) ){ <<<--- removing this decouples the HAL and Font module
 		return;
-	}
+	}*/
 
-	//double character so it looks bold
 	draw_character_raw(x, y, fonts_char_to_font(c), size, color );
-	draw_character_raw(x+1, y+1, fonts_char_to_font(c), size, color );
-
 }
 
 static void draw_character_raw( uint32_t x, uint32_t y, VideoFont* c, uint32_t size, VideoColor color ){
@@ -163,10 +182,17 @@ static int32_t abs(int32_t v){
 *  HAL IO Video PutPixel
 */
 void hal_io_video_put_pixel( VideoXY* pos, VideoColor color ){
-	//_hal_io_video_put_pixel_raw(  x_y_to_raw(pos->x,pos->y), color );   <<<---- This is defined in ARM assembly,
-	//																			 any 32-bit assembly will break
-	//																			 the build
-	SmartStartPutPixelRaw( x_y_to_raw(pos->x,pos->y), color );
+	_hal_io_video_put_pixel_raw(  x_y_to_raw(pos->x,pos->y), color );
+}
+
+void hal_io_clear_screen( void ){
+	for( int y=0; y<VIDEO_MAX_Y; y++ ){
+		for( int x=0; x<VIDEO_MAX_X*2; x++ ){
+			_hal_io_video_put_pixel_raw(  x_y_to_raw(x,y), VIDEO_COLOR_BLACK );
+		}
+	}
+  curr_x=X_ORIGIN;
+  curr_y=Y_ORIGIN;
 }
 
 static uint32_t x_y_to_raw(uint32_t x, uint32_t y){
