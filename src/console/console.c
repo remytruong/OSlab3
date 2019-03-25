@@ -14,8 +14,8 @@
 
 #include "console.h"
 
-//void run()
-//{
+//void run(char* buffer){
+//
 //    char input[64];
 //    int i = 0;
 //    char folder[300];
@@ -35,211 +35,27 @@
 //        if(c == '\r') {
 //            input[i++] = '\0';
 //            char* token = strtok(input, " ");
-//
 //            if(!strcmp(input, "evit")) {
-//                char buffer[32767];
-//                int cursor = 0;
-//                int eof = 1;
-//                buffer[cursor] = '_';
-//                buffer[eof] = '\0';
-//                hal_io_clear_screen();
-//                printf_video(buffer);
-//
-//                int terminate = 0;
-//                while(!terminate) {
-//                    c = hal_io_serial_getc( SerialA );
-//                    if (c == 27) {
-//                        c = hal_io_serial_getc( SerialA );
-//                        c = hal_io_serial_getc( SerialA );
-//                        if (c == 'C') {
-//                            printf_serial(" >");
-//                            if (cursor < eof - 1) {
-//                                buffer[cursor] = buffer[cursor+1];
-//                                buffer[++cursor] = '_';
-//                            }
-//                        }
-//                        else if (c == 'D') {
-//                            printf_serial(" <");
-//                            if (cursor > 0) {
-//                                buffer[cursor] = buffer[cursor-1];
-//                                buffer[--cursor] = '_';
-//                            }
-//                        }
-//                        else {
-//                            terminate = 1;
-//                        }
-//                    }
-//                    else if (c == 127) {
-//                        printf_serial(" BS");
-//                        for(int it = cursor; it <= eof; ++it) {
-//                            buffer[it - 1] = buffer[it];
-//                        }
-//                        --cursor;
-//                    }
-//                    else {
-//                        ++eof;
-//                        for(int it = eof; it > cursor; --it) {
-//                            buffer[it] = buffer[it-1];
-//                        }
-//                        buffer[cursor++] = c;
-//                        if (c == '\r') {
-//                            ++eof;
-//                            for(int it = eof; it > cursor; --it) {
-//                                buffer[it] = buffer[it-1];
-//                            }
-//                            buffer[cursor++] = '\n';
-//                        }
-//                        buffer[eof] = '\0';
-//                    }
-//                    hal_io_clear_screen();
-//                    printf_video(buffer);
-//                }
+//                runTextEditor(c);
 //            }
-//
 //            if (!strcmp(token, "cat")) {
-//                token = strtok(NULL, " ");
-//                printf_serial("\n\r%s", token);
-//                printf_serial("\n\n");
-//                printf_serial("Opening %s \n", token);
-//                char temp[200];
-//                strcpy(temp, dest);
-//                strcat(temp, "\\");
-//                strcat(temp, token);
-//                HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-//                if (fHandle != 0) {
-//                    uint32_t bytesRead;
-//
-//                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
-//                        buffer[bytesRead - 1] = '\0';  ///insert null char
-//                        printf_serial("File Contents: %s", &buffer[0]);
-//                        printf_video("\n\r%s\n\r", &buffer[0]);
-//                    }
-//                    else {
-//                        printf_serial("Failed to read");
-//                    }
-//
-//                    // Close the file
-//                    sdCloseHandle(fHandle);
-//
-//                }
-//                else {
-//                    printf_serial("Unable to find file %s", token);
-//                    printf_video("\n\r Unable to find file %s", token);
-//                }
-//                printf_serial("\n");
+//                printText(buffer, token, dest);
 //            }
-//
 //            if (!strcmp(input, "cd")) {
-//                token = strtok(NULL, " ");
-//                if (!strcmp(token, "..")) {
-//                    size_t startpoint = strlen(dest);
-//                    for (size_t i = startpoint; i >= 0; --i) {
-//                        if (dest[i] == '\\') {
-//                            char test[500];
-//                            strcpy(test, dest);
-//                            strcpy(dest, "");
-//                            for (size_t d = 0; d < i; d++) {
-//                                dest[d] = test[d];
-//                            }
-//                            dest[i] = '\0';
-//                            break;
-//                        }
-//                        if (i == 0) {
-//                            strcpy(dest, "");
-//                        }
-//                    }
-//                }
-//                else {
-//                    strcat(dest, "\\");
-//                    strcat(dest, token);
-//                    printf_serial("\n\n");
-//                    printf_serial("cding to %s \n", token);
-//                }
+//                changeDirectory(token, dest);
 //            }
-//
 //            if(!strcmp(input, "ls")) {
-//                printf_serial("\n\nDirectory (%s): \n", folder);
-//                printf_video("\n\r");
-//                char directory[500];
-//                strcpy(directory, "");
-//                strcat(directory, dest);
-//                strcat(directory, "\\*.*");
-//                DisplayDirectory(directory);
+//                DisplayDirectory(folder, dest);
 //            }
-//
 //            if(!strcmp(input, "sysinfo")) {
 //                sys_info(OS_NAME);
 //                sys_info(OS_VERSION);
 //            }
-//
 //            if(!strcmp(input, "dump")) {
-//                token = strtok(NULL, " ");
-//                printf_serial("\n\r%s", token);
-//                printf_serial("\n\n");
-//                printf_serial("Dumping %s \n", token);
-//
-//                char temp[200];
-//                strcpy(temp, dest);
-//                strcat(temp, "\\");
-//                strcat(temp, token);
-//
-//                HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-//                if (fHandle != 0) {
-//                    uint32_t bytesRead;
-//
-//                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
-//                        buffer[bytesRead - 1] = '\0';  ///insert null char
-//                        int bin_i = 0;
-//
-//                        while(buffer[bin_i] != '\0'){
-//                            if(bin_i % 16 == 0) {
-//                                printf_serial("\n");
-//                                printf_video("\n\r");
-//                            }
-//                            printf_serial("%02x ", buffer[bin_i]);
-//                            printf_video("%02x ", buffer[bin_i]);
-//                            ++bin_i;
-//                        }
-//                    }
-//                    else {
-//                        printf_serial("Failed to read");
-//                    }
-//
-//                    // Close the file
-//                    sdCloseHandle(fHandle);
-//
-//                }
-//                else {
-//                    printf_serial("Unable to find file %s", token);
-//                    printf_video("\n\r Unable to find file %s", token);
-//                }
-//                printf_serial("\n");
+//                printBinary(buffer, token, dest);
 //            }
 //            else if(!strcmp(&input[strlen(input)-4], runnable)) {
-//                printf_serial("\n\n");
-//                printf_serial("Running %s: \n", input);
-//
-//                HANDLE fHandle = sdCreateFile(input, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-//                if (fHandle != 0) {
-//                    uint32_t bytesRead;
-//
-//                    if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
-//                        int ret = ((int(*)(void))(buffer))();
-//                        printf_serial("%d",ret);
-//                    }
-//                    else {
-//                        printf_serial("Failed to read");
-//                    }
-//
-//                    // Close the file
-//                    sdCloseHandle(fHandle);
-//
-//                }
-//                else {
-//                    printf_serial("Unable to find file %s", input);
-//                    printf_video("\n\r Unable to find file %s", input);
-//                }
-//                printf_serial("\n");
+//                runFile(buffer, input);
 //            }
 //            hal_io_video_puts( "\n\r$ ", 2, VIDEO_COLOR_GREEN );
 //            printf_video("%s ", folder);
@@ -253,6 +69,7 @@
 //        }
 //
 //    }
+//
 //}
 
 void sys_info( uint8_t* msg ){
@@ -260,11 +77,17 @@ void sys_info( uint8_t* msg ){
     printf_serial( "\n\r%s\r", msg );
 }
 
-void DisplayDirectory(const char* dirName) {
+void DisplayDirectory(char* folder, char* dest) {
+    printf_serial("\n\nDirectory (%s): \n", folder);
+    printf_video("\n\r");
+    char directory[500];
+    strcpy(directory, "");
+    strcat(directory, dest);
+    strcat(directory, "\\*.*");
     HANDLE fh;
     FIND_DATA find;
     char* month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-    fh = sdFindFirstFile(dirName, &find);							// Find first file
+    fh = sdFindFirstFile(directory, &find);							// Find first file
     do {
         if (find.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY) {
             printf_serial("%s <DIR>\n", find.cFileName);
@@ -286,4 +109,199 @@ void DisplayDirectory(const char* dirName) {
         }
     } while (sdFindNextFile(fh, &find) != 0);						// Loop finding next file
     sdFindClose(fh);												// Close the serach handle
+}
+
+void changeDirectory(const char* token, char* dest) {
+    token = strtok(NULL, " ");
+    if (!strcmp(token, "..")) {
+        size_t startpoint = strlen(dest);
+        for (size_t i = startpoint; i >= 0; --i) {
+            if (dest[i] == '\\') {
+                char test[500];
+                strcpy(test, dest);
+                strcpy(dest, "");
+                for (size_t d = 0; d < i; d++) {
+                    dest[d] = test[d];
+                }
+                dest[i] = '\0';
+                break;
+            }
+            if (i == 0) {
+                strcpy(dest, "");
+            }
+        }
+    }
+    else {
+        strcat(dest, "\\");
+        strcat(dest, token);
+        printf_serial("\n\n");
+        printf_serial("cding to %s \n", token);
+    }
+}
+
+void printText(char *buffer, const char* token, char* dest) {
+    token = strtok(NULL, " ");
+    printf_serial("\n\r%s", token);
+    printf_serial("\n\n");
+    printf_serial("Opening %s \n", token);
+    char temp[200];
+    strcpy(temp, dest);
+    strcat(temp, "\\");
+    strcat(temp, token);
+    HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (fHandle != 0) {
+        uint32_t bytesRead;
+
+        if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+            buffer[bytesRead - 1] = '\0';  ///insert null char
+            printf_serial("File Contents: %s", &buffer[0]);
+            printf_video("\n\r%s\n\r", &buffer[0]);
+        }
+        else {
+            printf_serial("Failed to read");
+        }
+
+        // Close the file
+        sdCloseHandle(fHandle);
+
+    }
+    else {
+        printf_serial("Unable to find file %s", token);
+        printf_video("\n\r Unable to find file %s", token);
+    }
+    printf_serial("\n");
+}
+
+void printBinary(char* buffer, const char* token, char* dest) {
+        token = strtok(NULL, " ");
+        printf_serial("\n\r%s", token);
+        printf_serial("\n\n");
+        printf_serial("Dumping %s \n", token);
+
+        char temp[200];
+        strcpy(temp, dest);
+        strcat(temp, "\\");
+        strcat(temp, token);
+
+        HANDLE fHandle = sdCreateFile(temp, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+        if (fHandle != 0) {
+            uint32_t bytesRead;
+
+            if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+                buffer[bytesRead - 1] = '\0';  ///insert null char
+                int bin_i = 0;
+
+                while(buffer[bin_i] != '\0'){
+                    if(bin_i % 16 == 0) {
+                        printf_serial("\n");
+                        printf_video("\n\r");
+                    }
+                    printf_serial("%02x ", buffer[bin_i]);
+                    printf_video("%02x ", buffer[bin_i]);
+                    ++bin_i;
+                }
+            }
+            else {
+                printf_serial("Failed to read");
+            }
+
+            // Close the file
+            sdCloseHandle(fHandle);
+
+        }
+        else {
+            printf_serial("Unable to find file %s", token);
+            printf_video("\n\rUnable to find file %s", token);
+        }
+        printf_serial("\n");
+}
+
+void runFile(char* buffer, char* input) {
+    printf_serial("\n\n");
+    printf_serial("Running %s: \n", input);
+    printf_video("\n\rRunning %s: \n\r", input);
+
+    HANDLE fHandle = sdCreateFile(input, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (fHandle != 0) {
+        uint32_t bytesRead;
+
+        if ((sdReadFile(fHandle, &buffer[0], 500, &bytesRead, 0) == true)) {
+            int ret = ((int(*)(void))(buffer))();
+            printf_serial("%d",ret);
+            printf_video("\n\r%d",ret);
+        }
+        else {
+            printf_serial("Failed to read");
+        }
+
+        // Close the file
+        sdCloseHandle(fHandle);
+
+    }
+    else {
+        printf_serial("Unable to find file %s", input);
+        printf_video("\n\r Unable to find file %s", input);
+    }
+    printf_serial("\n");
+}
+
+void runTextEditor(uint8_t c)
+{
+    char buffer[32767];
+    int cursor = 0;
+    int eof = 1;
+    buffer[cursor] = '_';
+    buffer[eof] = '\0';
+    hal_io_clear_screen();
+    printf_video(buffer);
+
+    int terminate = 0;
+    while(!terminate) {
+        c = hal_io_serial_getc( SerialA );
+        if (c == 27) {
+            c = hal_io_serial_getc( SerialA );
+            c = hal_io_serial_getc( SerialA );
+            if (c == 'C') {
+                printf_serial(" >");
+                if (cursor < eof - 1) {
+                    buffer[cursor] = buffer[cursor+1];
+                    buffer[++cursor] = '_';
+                }
+            }
+            else if (c == 'D') {
+                printf_serial(" <");
+                if (cursor > 0) {
+                    buffer[cursor] = buffer[cursor-1];
+                    buffer[--cursor] = '_';
+                }
+            }
+            else {
+                terminate = 1;
+            }
+        }
+        else if (c == 127) {
+            printf_serial(" BS");
+            for(int it = cursor; it <= eof; ++it) {
+                buffer[it - 1] = buffer[it];
+            }
+            --cursor;
+        }
+        else {
+            ++eof;
+            for(int it = eof; it > cursor; --it) {
+                buffer[it] = buffer[it-1];
+            }
+            buffer[cursor++] = c;
+            if (c == '\r') {
+                ++eof;
+                for(int it = eof; it > cursor; --it) {
+                    buffer[it] = buffer[it-1];
+                }
+                buffer[cursor++] = '\n';
+            }
+            buffer[eof] = '\0';
+        }
+        hal_io_clear_screen();
+        printf_video(buffer);
+    }
 }
